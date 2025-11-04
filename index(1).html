@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>LilPCock — Neon Arcade (Roulette • Blackjack • War • Coin Flip)</title>
+<meta name="description" content="LilPCock — PulseChain meme arcade. Wins spawn celebratory peacocks.">
+<meta name="theme-color" content="#9a00ff">
+<style>
+:root{
+  --bg:#070512; --panel:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.14);
+  --txt:#e8f2ff; --muted:#bcd0ff; --mag:#ff00ff; --cyn:#00ffff; --gold:#ffd84d;
+  --green:#11b86d; --red:#ff4d5a; --black:#02030b;
+}
+*{box-sizing:border-box} html,body{height:100%} body{margin:0;background:radial-gradient(1200px 700px at 50% -10%, #1b237f 0%, #070512 60%, #05040b 100%);color:var(--txt);font-family:system-ui,Segoe UI,Roboto,Arial;-webkit-tap-highlight-color:transparent}
+a{color:#9ad1ff;text-decoration:none} a:hover{text-decoration:underline}
+.top{display:flex;gap:8px;align-items:center;padding:10px;border-bottom:1px solid var(--stroke);background:rgba(8,10,26,.78);backdrop-filter:blur(10px);position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.3px}
+.brandMark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--mag),var(--cyn));position:relative;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.brandMark canvas{position:absolute;inset:0}
+.nav{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.btn{padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:linear-gradient(180deg,#fff,#cfe8ff);color:#000;font-weight:800}
+.btn.neon{background:linear-gradient(90deg,var(--mag),var(--cyn));border:none}
+.btn.ghost{background:transparent;color:var(--txt)}
+.main{padding:10px}
+.panel{border:1px solid var(--stroke);background:var(--panel);border-radius:16px;padding:12px;margin:10px 0;position:relative;overflow:hidden}
+h1,h2{margin:.3em 0}.tiny{font-size:12px;opacity:.75}.small{font-size:13px;opacity:.85}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1;min-width:260px}
+.canvasWrap{border:1px solid var(--stroke);border-radius:16px;overflow:hidden;background:#0b1333}
+canvas{width:100%;height:auto;display:block}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.cell{position:relative;padding:10px;border-radius:10px;border:1px solid var(--stroke);text-align:center;font-weight:900}
+.cell.red{background:#2b0d18;border-color:rgba(255,0,64,.35);color:#ff9aa8}
+.cell.black{background:#0d0f1d;border-color:rgba(255,255,255,.12);color:#cdd5ff}
+.cell.green{background:#07271b;border-color:rgba(0,255,170,.3);color:#9ff2c8}
+.hrow{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}
+.hbtn{position:relative;padding:10px;border-radius:10px;border:1px solid var(--stroke);text-align:center;font-weight:900;background:rgba(255,255,255,.05)}
+.kit{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--stroke);background:rgba(255,255,255,.06);font-size:12px;margin-right:6px}
+.footer{opacity:.6;text-align:center;padding:12px}
+.hidden{display:none}
+.hero{display:grid;gap:14px;grid-template-columns:1.2fr .8fr;align-items:center}
+@media (max-width:880px){ .hero{grid-template-columns:1fr} }
+.card{border:1px solid var(--stroke);background:rgba(255,255,255,.05);border-radius:16px;padding:12px}
+.callout{border:1px dashed var(--stroke);background:rgba(255,255,255,.04);padding:12px;border-radius:12px}
+.ctaRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.cta{padding:12px 14px;border-radius:14px;border:none;font-weight:900}
+.cta.primary{background:linear-gradient(90deg,var(--mag),var(--cyn));color:#000}
+.cta.secondary{background:linear-gradient(180deg,#fff,#d7ebff);color:#000;border:1px solid var(--stroke)}
+.watermark{position:absolute;inset:0;pointer-events:none;opacity:.14}
+.table{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.stack{flex:1;min-width:260px}
+.playbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tag{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--stroke);background:rgba(255,255,255,.06)}
+.cardRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.card{width:56px;height:78px;border-radius:8px;border:1px solid var(--stroke);background:linear-gradient(180deg,#ffffff,#e9f2ff);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900}
+.card.red{color:#c9142d}
+.coin{width:120px;height:120px;border-radius:60px;border:1px solid var(--stroke);background:radial-gradient(circle at 35% 35%,#fff,#e4f0ff);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.coinZone{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+/* chip marker */
+.chipMark{position:absolute;right:6px;bottom:6px;background:linear-gradient(90deg,var(--mag),var(--cyn));color:#000;border-radius:999px;padding:4px 7px;font-size:12px;font-weight:900;border:1px solid rgba(255,255,255,.35);box-shadow:0 4px 10px rgba(0,0,0,.35)}
+.btnMark{position:absolute;right:6px;top:6px;background:linear-gradient(180deg,#fff,#dff3ff);color:#000;border-radius:999px;padding:2px 6px;font-size:11px;font-weight:900;border:1px solid rgba(0,0,0,.15)}
+/* Home peacocks row */
+.peaRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.pea{width:100px;height:100px;border-radius:16px;border:1px solid var(--stroke);background:rgba(255,255,255,.06);position:relative;overflow:hidden}
+.pea canvas{position:absolute;inset:0}
+
+/* Celebration peacocks */
+.cele{position:fixed; z-index:9999; pointer-events:none; width:80px; height:80px; animation: floatUp 1.8s ease-out forwards;}
+@keyframes floatUp{
+  0%{ transform: translateY(0) scale(0.9); opacity:0; }
+  10%{ opacity:1; }
+  100%{ transform: translateY(-160px) scale(1.05); opacity:0; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="brandMark"><canvas id="logoMark" width="36" height="36"></canvas></div>
+    <div>LilPCock <span class="tiny" style="opacity:.8">Pulse Meme Arcade</span></div>
+  </div>
+  <div class="nav">
+    <button class="btn" data-nav="home">Home</button>
+    <button class="btn" data-nav="roulette">Roulette</button>
+    <button class="btn" data-nav="blackjack">Blackjack</button>
+    <button class="btn" data-nav="war">War</button>
+    <button class="btn" data-nav="flip">Coin Flip</button>
+    <button class="btn" data-nav="about">About</button>
+  </div>
+</header>
+
+<div class="main">
+  <!-- HOME -->
+  <section id="home" class="panel">
+    <canvas id="wmHome" class="watermark" width="1400" height="700"></canvas>
+    <div class="hero">
+      <div>
+        <h1>Welcome to <span style="background:linear-gradient(90deg,var(--mag),var(--cyn));-webkit-background-clip:text;background-clip:text;color:transparent">LilPCock</span></h1>
+        <p class="small">PulseChain's cute‑but‑deadly meme arcade. Play free demos now — token launches on <b>pump.tires</b> soon. Wallet‑free, for‑fun only.</p>
+        <div class="ctaRow">
+          <a class="cta primary" id="pumpLink" href="#" target="_blank" rel="noopener">🚀 Buy LILP on pump.tires</a>
+          <button class="cta secondary" data-nav="roulette">🎰 Roulette</button>
+          <button class="cta secondary" data-nav="blackjack">🂡 Blackjack</button>
+          <button class="cta secondary" data-nav="war">⚔️ War</button>
+          <button class="cta secondary" data-nav="flip">🪙 Coin Flip</button>
+        </div>
+        <div class="peaRow">
+          <div class="pea"><canvas class="mini" width="100" height="100"></canvas></div>
+          <div class="pea"><canvas class="mini" width="100" height="100"></canvas></div>
+          <div class="pea"><canvas class="mini" width="100" height="100"></canvas></div>
+          <div class="pea"><canvas class="mini" width="100" height="100"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Launch Notes</h3>
+        <ul class="tiny">
+          <li>Deploy LILP on <b>pump.tires</b> → copy token URL</li>
+          <li>Edit this file → set link for pump.tires</li>
+          <li>Upload to GitHub Pages / Vercel / Netlify</li>
+          <li>Put site URL in your pump.tires description</li>
+        </ul>
+        <div class="callout tiny">Demo build. No real wagers. Brand: <b>LilPCock</b> 🦚</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROULETTE -->
+  <section id="roulette" class="panel hidden">
+    <div class="row">
+      <div class="col">
+        <h2>Roulette</h2>
+        <div class="canvasWrap"><canvas id="wheel" width="520" height="520"></canvas></div>
+        <div class="kit">
+          <span class="badge">Balance: <b id="balance">10,000</b> demo</span>
+          <span class="badge">Bet: <b id="betTotal">0</b></span>
+          <button id="spin" class="btn neon">SPIN</button>
+          <button id="clear" class="btn">Clear</button>
+        </div>
+        <div class="kit">
+          <span class="small">Chip:</span>
+          <button class="btn ghost chip" data-chip="10">10</button>
+          <button class="btn ghost chip sel" data-chip="50">50</button>
+          <button class="btn ghost chip" data-chip="100">100</button>
+          <button class="btn ghost chip" data-chip="500">500</button>
+          <button class="btn ghost chip" data-chip="1000">1000</button>
+        </div>
+      </div>
+      <div class="col">
+        <h2>Place Bets</h2>
+        <div class="hrow">
+          <button class="hbtn" data-bet="RED">RED (1:1)</button>
+          <button class="hbtn" data-bet="BLACK">BLACK (1:1)</button>
+          <button class="hbtn" data-bet="ODD">ODD (1:1)</button>
+          <button class="hbtn" data-bet="EVEN">EVEN (1:1)</button>
+          <button class="hbtn" data-bet="LOW">1–18 (1:1)</button>
+          <button class="hbtn" data-bet="HIGH">19–36 (1:1)</button>
+        </div>
+        <div class="hrow">
+          <button class="hbtn" data-bet="D1">1st 12 (2:1)</button>
+          <button class="hbtn" data-bet="D2">2nd 12 (2:1)</button>
+          <button class="hbtn" data-bet="D3">3rd 12 (2:1)</button>
+          <div></div><div></div><div></div>
+        </div>
+        <div class="small" style="margin-top:6px">Single Numbers (35:1)</div>
+        <div id="numGrid" class="grid"></div>
+        <div class="tiny" id="status">Ready.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLACKJACK -->
+  <section id="blackjack" class="panel hidden">
+    <h2>Blackjack — Split + Double</h2>
+    <div class="table">
+      <div class="stack">
+        <div class="tag">Dealer</div>
+        <div id="dealerRow" class="cardRow"></div>
+        <div class="tag" id="dealerVal">Value: 0</div>
+      </div>
+      <div class="stack">
+        <div class="tag">Player Hands</div>
+        <div id="playerHands"></div>
+        <div class="playbar">
+          <button class="btn neon" id="bjDeal">Deal</button>
+          <button class="btn" id="bjHit">Hit</button>
+          <button class="btn" id="bjStand">Stand</button>
+          <button class="btn" id="bjDouble">Double</button>
+          <button class="btn" id="bjSplit">Split</button>
+          <button class="btn ghost" id="bjReset">Reset</button>
+        </div>
+        <div class="tag" id="bjInfo">Hand 1 / 1</div>
+        <div id="bjResult" class="callout tiny"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAR -->
+  <section id="war" class="panel hidden">
+    <h2>War (Demo)</h2>
+    <div class="table">
+      <div class="stack">
+        <div class="tag">Dealer</div>
+        <div id="warDealer" class="cardRow"></div>
+      </div>
+      <div class="stack">
+        <div class="tag">You</div>
+        <div id="warPlayer" class="cardRow"></div>
+        <div class="playbar">
+          <button class="btn neon" id="warDraw">Draw</button>
+          <button class="btn ghost" id="warReset">Reset</button>
+        </div>
+        <div id="warResult" class="callout tiny"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COIN FLIP -->
+  <section id="flip" class="panel hidden">
+    <h2>Coin Flip (Demo)</h2>
+    <div class="coinZone">
+      <div class="coin" id="coinFace">LilPCock</div>
+      <div class="playbar">
+        <button class="btn neon" id="flipBtn">Flip</button>
+        <button class="btn" id="pickHeads">Pick Heads</button>
+        <button class="btn" id="pickTails">Pick Tails</button>
+      </div>
+    </div>
+    <div class="kit">
+      <span class="badge">Your pick: <b id="pick">–</b></span>
+      <span class="badge">Result: <b id="flipOut">–</b></span>
+      <span class="badge">Record: <b id="wins">0</b>W‑<b id="losses">0</b>L</span>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="panel hidden">
+    <h2>About LilPCock</h2>
+    <p class="small"><b>LilPCock</b> is a playful PulseChain meme arcade — wallet‑free demos today, token launch on <b>pump.tires</b> coming up. Neon feathers, tiny peacocks, big vibes.</p>
+    <ul class="tiny">
+      <li>Games: Roulette, Blackjack (Split + Double), War, Coin Flip</li>
+      <li>On‑chain arcades + leaderboards later</li>
+      <li>Replace the pump.tires link after launch</li>
+    </ul>
+    <div class="ctaRow">
+      <a class="cta primary" id="pumpLink2" href="#" target="_blank" rel="noopener">🚀 Buy LILP on pump.tires</a>
+    </div>
+  </section>
+</div>
+
+<div class="footer tiny">© LilPCock — Demo build. No gambling; RNG demos only.</div>
+
+<script>
+/* Router */
+const sections=['home','roulette','blackjack','war','flip','about'];
+document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{
+  const id=b.getAttribute('data-nav'); sections.forEach(s=>document.getElementById(s).classList.add('hidden')); document.getElementById(id).classList.remove('hidden');
+}));
+
+/* Mini peacocks */
+function drawLil(ctx,w,h,seed=0){
+  for(let i=0;i<12;i++){
+    const a=i/12*Math.PI*2 + seed, r=Math.min(w,h)*0.42;
+    ctx.fillStyle = i%2? 'rgba(0,255,255,.5)':'rgba(255,0,255,.5)';
+    ctx.beginPath(); ctx.arc(w/2 + Math.cos(a)*r, h/2 + Math.sin(a)*r, 6, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle='#1f5ef0'; ctx.beginPath(); ctx.ellipse(w/2, h/2+6, 18, 14, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w/2+14, h/2-4, 7, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle='#ffd84d'; ctx.beginPath(); ctx.moveTo(w/2+18,h/2-4); ctx.lineTo(w/2+28,h/2); ctx.lineTo(w/2+18,h/2+2); ctx.closePath(); ctx.fill();
+}
+document.querySelectorAll('canvas.mini').forEach((c,i)=>{ const ctx=c.getContext('2d'); drawLil(ctx, c.width, c.height, i*0.4); });
+
+/* Celebration peacocks */
+function spawnPeacocks(count=1){
+  for(let i=0;i<count;i++){
+    const d=document.createElement('div'); d.className='cele'; d.style.left = Math.round(Math.random()*80+10)+'%'; d.style.bottom='20px';
+    const c=document.createElement('canvas'); c.width=80; c.height=80; d.appendChild(c);
+    document.body.appendChild(d);
+    const ctx=c.getContext('2d'); drawLil(ctx, 80, 80, Math.random()*2);
+    setTimeout(()=>d.remove(), 1900);
+  }
+}
+
+/* ===== Roulette with chip markers ===== */
+function rand(){ return Math.random(); }
+const numbers=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const colors={}; const redSet=new Set([32,19,21,25,34,27,36,30,23,5,16,1,14,9,18,7,12,3]); numbers.forEach(n=>colors[n]=(n===0)?'green':(redSet.has(n)?'red':'black'));
+const cv=document.getElementById('wheel'), cx=cv.getContext('2d'), W=cv.width, H=cv.height, R=W/2-10;
+let spinAngle=0, spinSpeed=0, ballAngle=0, ballSpeed=0, spinning=false;
+function drawWheel(){
+  cx.clearRect(0,0,W,H);
+  const grd=cx.createRadialGradient(W/2,H/2,60,W/2,H/2,R+20); grd.addColorStop(0,'#0d1232'); grd.addColorStop(1,'#070a1c'); cx.fillStyle=grd; cx.beginPath(); cx.arc(W/2,H/2,R+10,0,Math.PI*2); cx.fill();
+  const n=numbers.length, step=(Math.PI*2)/n;
+  for(let i=0;i<n;i++){
+    const a=spinAngle + i*step; const nVal=numbers[i];
+    cx.beginPath(); cx.moveTo(W/2,H/2); cx.arc(W/2,H/2,R-10,a,a+step,false); cx.closePath();
+    let col=colors[nVal]; cx.fillStyle=(col==='red')?'#7a1131':(col==='black')?'#0b0f1c':'#0b3a1f'; cx.fill();
+    cx.strokeStyle='rgba(255,255,255,.08)'; cx.lineWidth=1; cx.stroke();
+    cx.save(); cx.translate(W/2,H/2); cx.rotate(a+step/2); cx.textAlign='right'; cx.textBaseline='middle';
+    cx.fillStyle=(col==='black')?'#cdd5ff':'#ffd4dc'; if(col==='green') cx.fillStyle='#9ff2c8'; cx.font='bold 14px system-ui,Arial'; cx.fillText(String(nVal), R-20, 0); cx.restore();
+  }
+  cx.strokeStyle='rgba(255,255,255,.2)'; cx.lineWidth=6; cx.beginPath(); cx.arc(W/2,H/2,R-6,0,Math.PI*2); cx.stroke();
+  cx.strokeStyle='rgba(255,0,255,.35)'; cx.lineWidth=2; cx.beginPath(); cx.arc(W/2,H/2,R-36,0,Math.PI*2); cx.stroke();
+  const ballR=R-28, bx=W/2 + ballR*Math.cos(ballAngle), by=H/2 + ballR*Math.sin(ballAngle);
+  const g=cx.createRadialGradient(bx-3,by-3,3,bx,by,8); g.addColorStop(0,'#fff8c4'); g.addColorStop(1,'#a58d2a'); cx.fillStyle=g; cx.beginPath(); cx.arc(bx,by,7,0,Math.PI*2); cx.fill();
+}
+let balance=10000, betUnit=50; const betMap={};
+function updateHud(){ const b=document.getElementById('balance'); if(b) b.textContent=balance.toLocaleString(); const bt=document.getElementById('betTotal'); if(bt) bt.textContent=totalBet().toLocaleString(); }
+function totalBet(){ return Object.values(betMap).reduce((a,b)=>a+b,0); }
+function addBet(key){
+  const amt=betUnit; if(balance<amt){ setStatus('Not enough demo credits.'); return; }
+  balance-=amt; betMap[key]=(betMap[key]||0)+amt; updateHud(); setStatus('Bet '+key+' +'+amt);
+  if(key.startsWith('N')){
+    const n = key.slice(1);
+    const cell = document.querySelector(`.cell[data-n="${n}"]`);
+    if(cell){
+      let mark = cell.querySelector('.chipMark');
+      if(!mark){ mark = document.createElement('div'); mark.className='chipMark'; mark.textContent = betMap[key]; cell.appendChild(mark); }
+      else { mark.textContent = betMap[key]; }
+    }
+  } else {
+    const btn = document.querySelector(`.hbtn[data-bet="${key}"]`);
+    if(btn){
+      let m = btn.querySelector('.btnMark');
+      if(!m){ m=document.createElement('div'); m.className='btnMark'; m.textContent=betMap[key]; btn.appendChild(m); }
+      else { m.textContent = betMap[key]; }
+    }
+  }
+}
+function clearVisuals(){
+  document.querySelectorAll('.chipMark').forEach(e=>e.remove());
+  document.querySelectorAll('.btnMark').forEach(e=>e.remove());
+}
+function clearBets(){ const refund=totalBet(); for(const k in betMap) delete betMap[k]; balance+=refund; updateHud(); setStatus('Bets cleared (+'+refund+')'); clearVisuals(); }
+function setStatus(t){ const s=document.getElementById('status'); if(s) s.textContent=t; }
+
+const grid=document.getElementById('numGrid');
+if(grid){
+  for(let r=12;r>=0;r--){
+    if(r===12){ const c=document.createElement('div'); c.className='cell green'; c.dataset.n='0'; c.textContent='0'; c.onclick=()=>addBet('N0'); grid.appendChild(c); continue; }
+    for(let c=1;c<=3;c++){ const num=r*3+c, nVal=num; const div=document.createElement('div'); const col=colors[nVal]; div.className='cell ' + (col==='red'?'red':'black'); div.dataset.n=String(nVal); div.textContent=String(nVal); div.onclick=(()=>addBet('N'+nVal)); grid.appendChild(div); }
+  }
+}
+document.querySelectorAll('.hbtn').forEach(b=>b.addEventListener('click',()=>addBet(b.dataset.bet)));
+document.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{ document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel')); ch.classList.add('sel'); betUnit=parseInt(ch.dataset.chip,10); }));
+const clearBtn=document.getElementById('clear'); if(clearBtn) clearBtn.onclick=clearBets;
+function spin(){
+  if(spinning){ setStatus('Already spinning…'); return; }
+  const total=totalBet(); if(total<=0){ setStatus('Place a bet first.'); return; }
+  spinning=true; const duration = 4600 + Math.floor(Math.random()*1400);
+  const targetIndex = Math.floor(Math.random()*numbers.length); const targetNum = numbers[targetIndex];
+  const step=(Math.PI*2)/numbers.length; const targetAngle=(targetIndex+0.5)*step;
+  spinSpeed = 0.42 + Math.random()*0.25; ballSpeed = -1.7 - Math.random()*0.6; setStatus('Spinning…');
+  const t0=performance.now();
+  function anim(t){ const dt=t-t0; const k=dt/duration; const ease=1-Math.pow(1-k,3);
+    spinAngle += spinSpeed*(1-ease)*0.98; ballAngle += ballSpeed*(1-ease)*1.02; drawWheel();
+    if(dt<duration){ requestAnimationFrame(anim); } else {
+      const wheelAngle=(spinAngle%(Math.PI*2)+Math.PI*2)%(Math.PI*2); ballAngle=wheelAngle+targetAngle; drawWheel(); finishSpin(targetNum);
+    }
+  } requestAnimationFrame(anim);
+}
+const spinBtn=document.getElementById('spin'); if(spinBtn) spinBtn.onclick=spin;
+function finishSpin(num){
+  spinning=false; let win=0;
+  for(const k in betMap){
+    const amt=betMap[k];
+    if(k.startsWith('N')){ const n=parseInt(k.slice(1),10); if(n===num) win += amt*36; }
+    else if(k==='RED' && colors[num]==='red' && num!==0){ win += amt*2; }
+    else if(k==='BLACK' && colors[num]==='black' && num!==0){ win += amt*2; }
+    else if(k==='ODD' && num!==0 && num%2===1){ win += amt*2; }
+    else if(k==='EVEN' && num!==0 && num%2===0){ win += amt*2; }
+    else if(k==='LOW' && num>=1 && num<=18){ win += amt*2; }
+    else if(k==='HIGH' && num>=19 && num<=36){ win += amt*2; }
+    else if(k==='D1' && num>=1 && num<=12){ win += amt*3; }
+    else if(k==='D2' && num>=13 && num<=24){ win += amt*3; }
+    else if(k==='D3' && num>=25 && num<=36){ win += amt*3; }
+  }
+  for(const k in betMap) delete betMap[k];
+  balance += win; updateHud(); setStatus(`Result: ${num} (${colors[num]}) • You won ${win} demo.`);
+  if(win>0){ const count = Math.min(8, Math.max(1, Math.floor(Math.log10(win+1))*2 + 1)); spawnPeacocks(count); }
+  clearVisuals();
+}
+updateHud(); drawWheel();
+
+/* ===== Blackjack with Split + Double ===== */
+const SUITS=['♠','♥','♦','♣']; const REDSUIT=new Set(['♥','♦']);
+function newDeck(){ const d=[]; for(const s of SUITS){ for(let v=1; v<=13; v++){ d.push({s, v}); } } for(let i=d.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [d[i],d[j]]=[d[j],d[i]]; } return d; }
+function valName(v){ return v===1?'A':v===11?'J':v===12?'Q':v===13?'K':String(v); }
+function cardEl(c){ const div=document.createElement('div'); div.className='card' + (REDSUIT.has(c.s)?' red':''); div.textContent=valName(c.v)+c.s; return div; }
+function handValue(hand){ let total=0, aces=0; for(const c of hand){ let add=(c.v>10)?10:c.v; if(c.v===1){aces++; add=1;} total+=add; } while(aces>0 && total+10<=21){ total+=10; aces--; } return total; }
+function splitValue(v){ return v>=10?10:(v===1?1:v); }
+
+let bjDeck, bjDealer, bjHands, activeHand, bjActive, bjHidden;
+const dealerRow=document.getElementById('dealerRow'), handsWrap=document.getElementById('playerHands');
+function renderHands(showDealer=false){
+  dealerRow.innerHTML='';
+  bjDealer.forEach((c,i)=>{
+    if(i===0 && !showDealer && bjHidden){ const div=document.createElement('div'); div.className='card'; div.textContent='🂠'; dealerRow.appendChild(div); }
+    else { dealerRow.appendChild(cardEl(c)); }
+  });
+  document.getElementById('dealerVal').textContent='Value: ' + (showDealer? handValue(bjDealer): '??');
+
+  handsWrap.innerHTML='';
+  bjHands.forEach((h,idx)=>{
+    const row=document.createElement('div'); row.className='cardRow';
+    h.cards.forEach(c=>row.appendChild(cardEl(c)));
+    const tag=document.createElement('div'); tag.className='tag'; tag.textContent=`Hand ${idx+1} — ${handValue(h.cards)}` + (idx===activeHand?' • (active)':'');
+    handsWrap.appendChild(row); handsWrap.appendChild(tag);
+  });
+  document.getElementById('bjInfo').textContent = `Hand ${Math.min(activeHand+1,bjHands.length)} / ${bjHands.length}`;
+}
+function resetBJ(){ bjDeck=newDeck(); bjDealer=[]; bjHands=[{cards:[], done:false, doubled:false}]; activeHand=0; bjActive=false; bjHidden=null; document.getElementById('bjResult').textContent=''; renderHands(false); }
+function dealBJ(){
+  resetBJ(); bjActive=true;
+  bjDealer.push(bjDeck.pop()); bjHidden=bjDealer[0];
+  bjHands[0].cards.push(bjDeck.pop());
+  bjDealer.push(bjDeck.pop());
+  bjHands[0].cards.push(bjDeck.pop());
+  renderHands(false);
+  if(handValue(bjHands[0].cards)===21){ standBJ(); }
+}
+function hitBJ(){
+  if(!bjActive) return;
+  const h=bjHands[activeHand];
+  h.cards.push(bjDeck.pop());
+  renderHands(false);
+  if(handValue(h.cards)>21){ h.done=true; nextHandOrDealer(); }
+}
+function standBJ(){ if(!bjActive) return; bjHands[activeHand].done=true; nextHandOrDealer(); }
+function doubleBJ(){
+  if(!bjActive) return;
+  const h=bjHands[activeHand];
+  if(h.cards.length!==2 || h.doubled) return;
+  h.doubled=true;
+  h.cards.push(bjDeck.pop());
+  renderHands(false);
+  h.done=true;
+  nextHandOrDealer();
+}
+function canSplitCurrent(){
+  const h=bjHands[activeHand]; if(h.cards.length!==2) return false;
+  const a=h.cards[0].v, b=h.cards[1].v;
+  return splitValue(a)===splitValue(b);
+}
+function splitBJ(){
+  if(!bjActive || !canSplitCurrent()) return;
+  const h=bjHands[activeHand];
+  const c1=h.cards[0], c2=h.cards[1];
+  const h1={cards:[c1], done:false, doubled:false};
+  const h2={cards:[c2], done:false, doubled:false};
+  h1.cards.push(bjDeck.pop());
+  h2.cards.push(bjDeck.pop());
+  bjHands.splice(activeHand,1,h1,h2);
+  renderHands(false);
+}
+function nextHandOrDealer(){
+  for(let i=0;i<bjHands.length;i++){
+    if(!bjHands[i].done){ activeHand=i; renderHands(false); return; }
+  }
+  dealerFinish();
+}
+function dealerFinish(){
+  renderHands(true);
+  while(handValue(bjDealer)<17){ bjDealer.push(bjDeck.pop()); renderHands(true); }
+  const dv=handValue(bjDealer);
+  let out=[]; let wins=0;
+  bjHands.forEach((h,i)=>{
+    const pv=handValue(h.cards);
+    let res;
+    if(pv>21) res=`Hand ${i+1}: Bust — Lose`;
+    else if(dv>21){ res=`Hand ${i+1}: Dealer busts — Win`; wins++; }
+    else if(pv>dv){ res=`Hand ${i+1}: Win`; wins++; }
+    else if(pv<dv) res=`Hand ${i+1}: Lose`;
+    else res=`Hand ${i+1}: Push`;
+    out.push(res);
+  });
+  if(wins>0){ spawnPeacocks(Math.min(10, wins*2)); }
+  document.getElementById('bjResult').textContent = out.join(' | ');
+  bjActive=false;
+}
+document.getElementById('bjDeal').onclick=dealBJ;
+document.getElementById('bjHit').onclick=hitBJ;
+document.getElementById('bjStand').onclick=standBJ;
+document.getElementById('bjDouble').onclick=doubleBJ;
+document.getElementById('bjSplit').onclick=splitBJ;
+document.getElementById('bjReset').onclick=resetBJ;
+resetBJ();
+
+/* ===== War ===== */
+function rankName(r){ return r===11?'J':r===12?'Q':r===13?'K':r===14?'A':String(r); }
+function newWarDeck(){ const d=[]; for(const s of SUITS){ for(let r=2;r<=14;r++){ d.push({s, r}); } } for(let i=d.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [d[i],d[j]]=[d[j],d[i]]; } return d; }
+let warDeck=newWarDeck(), warP=0, warD=0;
+function drawWarCard(){ if(warDeck.length<2) warDeck=newWarDeck(); const p=warDeck.pop(), d=warDeck.pop();
+  const pRow=document.getElementById('warPlayer'), dRow=document.getElementById('warDealer'); pRow.innerHTML=''; dRow.innerHTML='';
+  const pEl=document.createElement('div'); pEl.className='card' + (REDSUIT.has(p.s)?' red':''); pEl.textContent=rankName(p.r)+p.s;
+  const dEl=document.createElement('div'); dEl.className='card' + (REDSUIT.has(d.s)?' red':''); dEl.textContent=rankName(d.r)+d.s;
+  pRow.appendChild(pEl); dRow.appendChild(dEl);
+  let txt=''; if(p.r>d.r){ warP++; txt='You win the round!'; spawnPeacocks(2); } else if(p.r<d.r){ warD++; txt='Dealer wins the round.'; } else { txt='WAR! Tie round.'; }
+  document.getElementById('warResult').textContent = `${txt} Score You ${warP} — Dealer ${warD}`;
+}
+function resetWar(){ warDeck=newWarDeck(); warP=0; warD=0; document.getElementById('warPlayer').innerHTML=''; document.getElementById('warDealer').innerHTML=''; document.getElementById('warResult').textContent=''; }
+document.getElementById('warDraw').onclick=drawWarCard; document.getElementById('warReset').onclick=resetWar;
+
+/* ===== Coin Flip ===== */
+let pick='', winsEl=document.getElementById('wins'), lossesEl=document.getElementById('losses');
+document.getElementById('pickHeads').onclick=()=>{ pick='Heads'; document.getElementById('pick').textContent=pick; };
+document.getElementById('pickTails').onclick=()=>{ pick='Tails'; document.getElementById('pick').textContent=pick; };
+document.getElementById('flipBtn').onclick=()=>{
+  const coin=document.getElementById('coinFace');
+  if(!pick){ document.getElementById('flipOut').textContent='Pick Heads or Tails first.'; return; }
+  coin.style.transition='transform 0.9s'; coin.style.transform='rotateY(720deg)';
+  setTimeout(()=>{
+    coin.style.transition=''; coin.style.transform='';
+    const res = Math.random()<0.5 ? 'Heads' : 'Tails';
+    document.getElementById('flipOut').textContent=res; coin.textContent=res;
+    if(res===pick){ winsEl.textContent=String(parseInt(winsEl.textContent)+1); spawnPeacocks(3); }
+    else { lossesEl.textContent=String(parseInt(lossesEl.textContent)+1); }
+  }, 900);
+};
+
+/* Logo icon (fixed typo) */
+(function(){ const m=document.getElementById('logoMark'); const ctx=m.getContext('2d');
+  ctx.clearRect(0,0,m.width,m.height);
+  ctx.strokeStyle='rgba(255,255,255,.25)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(m.width/2,m.height/2,14,0,Math.PI*2); ctx.stroke();
+  const g=ctx.createLinearGradient(0,0,m.width,m.height); g.addColorStop(0,'#00ffff'); g.addColorStop(1,'#ff00ff');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(m.width/2+4,m.height/2-2,5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#ffd84d'; ctx.beginPath(); ctx.moveTo(m.width/2+8,m.height/2-2); ctx.lineTo(m.width/2+14,m.height/2); ctx.lineTo(m.width/2+8,m.height/2+2); ctx.closePath(); ctx.fill();
+})();
+</script>
+</body>
+</html>
